@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Survivor</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; color: white; }
+        canvas { display: none; margin: auto; border: 2px solid white; background-color: #333; }
+        #score { position: absolute; top: 10px; left: 10px; font-size: 20px; display: none; }
+        #gameOver, #menuScreen, #loadingScreen, #pauseMenu, #helpScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 50px;
+            color: white;
+            display: none;
+            text-align: center;
+        }
+        #menuScreen { display: block; }
+        #menuScreen button, #gameOver button, #pauseMenu button, #helpScreen button {
+            font-size: 30px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        #gameOver, #pauseMenu, #helpScreen {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+        }
+        #credits, #gameTitle { margin-top: 20px; font-size: 20px; opacity: 0.7; }
+        #gameTitle { font-size: 40px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="menuScreen">
+        <div id="gameTitle">Galactic Survivor</div>
+        <div>Welcome to the Game!</div>
+        <button onclick="startGame()">Play</button>
+        <button onclick="showHelp()">Help</button>
+        <div id="highScore">High Score: 0</div>
+        <div id="credits">Created by Phantom</div>
+    </div>
+    <div id="loadingScreen">Loading...</div>
+    <div id="score">Score: 0 <button id="pauseButton" onclick="togglePause()">⏸️</button></div>
+    <div id="gameOver">
+        Game Over! Press R to Restart<br>
+        <button onclick="showMenu()">Menu</button>
+    </div>
+    <div id="pauseMenu">
+        Game Paused<br>
+        <button onclick="togglePause()">Resume</button>
+        <button onclick="showMenu()">Menu</button>
+    </div>
+    <div id="helpScreen">
+        Game Controls:<br>
+        - Move: Arrow keys<br>
+        - Shoot: Spacebar<br>
+        - Restart: R<br>
+        - Pause: P or Pause Button<br>
+        <button onclick="showMenu()">Back to Menu</button>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const gameOverDisplay = document.getElementById('gameOver');
+        const menuScreen = document.getElementById('menuScreen');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const pauseMenu = document.getElementById('pauseMenu');
+        const highScoreDisplay = document.getElementById('highScore');
+        const helpScreen = document.getElementById('helpScreen');
+
+        let player, bullets, enemies;
+        let score = 0;
+        let highScore = localStorage.getItem('highScore') || 0;
+        let gameOver = false;
+        let isPaused = false;
+
+        highScoreDisplay.textContent = 'High Score: ' + highScore;
+
+        function startGame() {
+            menuScreen.style.display = 'none';
+            loadingScreen.style.display = 'block';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                scoreDisplay.style.display = 'block';
+                gameOverDisplay.style.display = 'none';
+                pauseMenu.style.display = 'none';
+                helpScreen.style.display = 'none';
+                canvas.style.display = 'block';
+                score = 0;
+                scoreDisplay.textContent = 'Score: 0';
+                player = { x: 400, y: 500, size: 30, color: '#00f', speed: 7 };
+                bullets = [];
+                enemies = [];
+                gameOver = false;
+                isPaused = false;
+                requestAnimationFrame(gameLoop);
+            }, 1000);
+        }
+
+        function showMenu() {
+            gameOverDisplay.style.display = 'none';
+            scoreDisplay.style.display = 'none';
+            canvas.style.display = 'none';
+            pauseMenu.style.display = 'none';
+            helpScreen.style.display = 'none';
+            menuScreen.style.display = 'block';
+            highScoreDisplay.textContent = 'High Score: ' + highScore;
+        }
+
+        function showHelp() {
+            menuScreen.style.display = 'none';
+            helpScreen.style.display = 'block';
+        }
+
+        function togglePause() {
+            if (menuScreen.style.display === 'block' || helpScreen.style.display === 'block') return;
+            isPaused = !isPaused;
+            pauseMenu.style.display = isPaused ? 'block' : 'none';
+            if (!isPaused) requestAnimationFrame(gameLoop);
+        }
+
+        function gameLoop() {
+            if (gameOver || isPaused) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>
